@@ -42,9 +42,81 @@
       if (document.querySelector('.mobile-nav-active')) {
         mobileNavToogle();
       }
+      
+      // Remove active class from all menu items
+      document.querySelectorAll('#navmenu a').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to clicked menu item
+      navmenu.classList.add('active');
     });
-
   });
+
+  // Set active class based on current section
+  function setActiveMenu() {
+    const sections = document.querySelectorAll('section[id]');
+    const scrollY = window.pageYOffset;
+    const offset = 100; // Offset untuk trigger lebih awal
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    // Handle special case for contact section first
+    const contactSection = document.querySelector('#contact');
+    if (contactSection) {
+      const contactTop = contactSection.offsetTop - offset;
+      const contactBottom = contactTop + contactSection.offsetHeight;
+      
+      // Check if we're near the bottom of the page or in contact section
+      if (scrollY + windowHeight >= documentHeight - 100 || 
+          (scrollY >= contactTop && scrollY < contactBottom)) {
+        document.querySelectorAll('#navmenu a').forEach(item => {
+          item.classList.remove('active');
+        });
+        const contactMenuItem = document.querySelector('#navmenu a[href*="contact"]');
+        if (contactMenuItem) {
+          contactMenuItem.classList.add('active');
+        }
+        return;
+      }
+    }
+
+    // Handle other sections
+    sections.forEach(section => {
+      const sectionHeight = section.offsetHeight;
+      const sectionTop = section.offsetTop - offset;
+      const sectionId = section.getAttribute('id');
+      const menuItem = document.querySelector('#navmenu a[href*=' + sectionId + ']');
+      
+      if (!menuItem) return;
+
+      if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+        // Remove active class from all menu items
+        document.querySelectorAll('#navmenu a').forEach(item => {
+          item.classList.remove('active');
+        });
+        // Add active class to current section's menu item
+        menuItem.classList.add('active');
+      }
+    });
+  }
+
+  // Throttle scroll event for better performance
+  function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+      const args = arguments;
+      const context = this;
+      if (!inThrottle) {
+        func.apply(context, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    }
+  }
+
+  window.addEventListener('scroll', throttle(setActiveMenu, 100));
+  window.addEventListener('load', setActiveMenu);
 
   /**
    * Toggle mobile nav dropdowns

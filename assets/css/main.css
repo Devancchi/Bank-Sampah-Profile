@@ -213,6 +213,24 @@ h6 {
     justify-content: space-between;
     white-space: nowrap;
     transition: 0.3s;
+    position: relative;
+  }
+
+  .navmenu a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: var(--nav-hover-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+
+  .navmenu a:hover::after,
+  .navmenu .active::after {
+    width: 100%;
   }
 
   .navmenu a i,
